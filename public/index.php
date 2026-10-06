@@ -1,0 +1,1 @@
+<?php echo 'Hallo aus deinem PHP-Webserver!'; ?>
