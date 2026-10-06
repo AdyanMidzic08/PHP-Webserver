@@ -1,2 +1,24 @@
 #!/usr/bin/env php
-<?php
+<?php 
+use ClanCats\Station\PHPServer\Server; 
+use ClanCats\Station\PHPServer\Request;
+use ClanCats\Station\PHPServer\Response;
+
+array_shift( $argv );
+
+if ( empty( $argv ) )
+{
+	$port = 80;
+} else {
+	$port = array_shift( $argv );
+}
+
+require 'vendor/autoload.php';
+
+$server = new Server( '127.0.0.1', $port );
+
+// start listening
+$server->listen( function( Request $request ) 
+{
+	return new Response( 'Hello Dude' );
+});
