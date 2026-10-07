@@ -20,5 +20,14 @@ $server = new Server( '127.0.0.1', $port );
 // start listening
 $server->listen( function( Request $request ) 
 {
-	return new Response( 'Hello Dude' );
+	$html = "<h1>PHP Raw Socket Server Demo</h1>";
+	$html .= "<p><strong>Method:</strong> " . htmlspecialchars($request->getMethod()) . "</p>";
+	$html .= "<p><strong>URI:</strong> " . htmlspecialchars($request->getUri()) . "</p>";
+	$html .= "<h3>Headers:</h3><ul>";
+	foreach ($request->getHeaders() as $key => $val) {
+		$html .= "<li><strong>" . htmlspecialchars($key) . ":</strong> " . htmlspecialchars($val) . "</li>";
+	}
+	$html .= "</ul>";
+
+	return new Response($html);
 });
