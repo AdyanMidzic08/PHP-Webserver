@@ -15,11 +15,33 @@ if ( empty( $argv ) )
 
 require 'vendor/autoload.php';
 
+define('SERVER_START_TIME', time());
+
 $server = new Server( '127.0.0.1', $port );
 
 // start listening
 $server->listen( function( Request $request ) 
 {
+    $uri = $request->getUri();
+
+    // Health check endpoint
+    if ($uri === '/health') {
+        $data = [
+            'status' => 'online',
+            'php_version' => PHP_VERSION,
+            'server_time' => date('Y-m-d H:i:s'),
+            'memory_usage' => round(memory_get_usage() / 1024 / 1024, 2) . ' MB',
+            'uptime_seconds' => time() - SERVER_START_TIME
+        ];
+        return new Response(json_encode($data), 200, ['Content-Type' => 'application/json']);
+    }
+
+    // Status code tester: /status/404
+    if (preg_match('#^/status/([0-9]+)$#', $uri, $matches)) {
+        $code = (int)$matches[1];
+        return new Response("<h1>Status Code: {$code}</h1><p>This is a test for HTTP status code {$code}.</p><a href='/'>Back to Home</a>", $code);
+    }
+
 	$html = "<h1>PHP Raw Socket Server Demo</h1>";
 	$html .= "<p><strong>Method:</strong> " . htmlspecialchars($request->getMethod()) . "</p>";
 	$html .= "<p><strong>URI:</strong> " . htmlspecialchars($request->getUri()) . "</p>";
@@ -28,6 +50,7 @@ $server->listen( function( Request $request )
 		$html .= "<li><strong>" . htmlspecialchars($key) . ":</strong> " . htmlspecialchars($val) . "</li>";
 	}
 	$html .= "</ul>";
+    $html .= "<hr><p><a href='/health'>Check Server Health (JSON)</a> | Test: <a href='/status/404'>404</a>, <a href='/status/500'>500</a>, <a href='/status/201'>201</a></p>";
 
 	return new Response($html);
 });

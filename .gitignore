@@ -1,0 +1,12 @@
+# Lokale Umgebungsvariablen (API-Keys)
+.env
+.env.local
+.env.*.local
+
+# Gemini CLI Konfigurationen & Logs
+.gemini/
+.geminiignore
+
+# OmniRoute lokale Daten & Keys
+.omniroute/
+omniroute.config.json
