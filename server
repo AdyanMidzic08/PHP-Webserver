@@ -38,6 +38,17 @@ $router->get('/health', function(Request $request) {
     return new Response(json_encode($data), 200, ['Content-Type' => 'application/json']);
 });
 
+$router->get('/status/{code}', function(Request $request, array $params) {
+    $code = (int)($params[0] ?? 200);
+    
+    $html = "<h1>Status Code: {$code}</h1>";
+    $html .= "<p>Dies ist ein Test für den HTTP-Statuscode {$code}.</p>";
+    $html .= "<hr><p><a href='/'>Zurück zur Startseite</a></p>";
+
+    return new Response($html, $code);
+});
+
+
 // Server starten (Port 8080)
 $server = new Server('127.0.0.1', 8080);
 
