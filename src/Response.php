@@ -71,7 +71,19 @@ class Response {
     {
         $phrase = $this->getStatusPhrase();
         $res = "HTTP/1.1 {$this->status} {$phrase}\r\n";
-        $res .= "Content-Type: text/html\r\n";
+
+        $hasContentType = false;
+        foreach ($this->headers as $key => $value) {
+            if (strtolower($key) === 'content-type') {
+                $hasContentType = true;
+                break;
+            }
+        }
+
+        if (!$hasContentType) {
+            $res .= "Content-Type: text/html; charset=UTF-8\r\n";
+        }
+
         $res .= "Content-Length: " . strlen($this->content) . "\r\n";
         
         foreach ($this->headers as $key => $value) {

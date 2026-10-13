@@ -4,53 +4,49 @@ use ClanCats\Station\PHPServer\Server;
 use ClanCats\Station\PHPServer\Request;
 use ClanCats\Station\PHPServer\Response;
 use ClanCats\Station\PHPServer\Router;
+use ClanCats\Station\PHPServer\View;
 
 require 'vendor/autoload.php';
 
 define('SERVER_START_TIME', time());
 
+// Port aus Argumenten oder Default 8080
+$port = 8080;
+if (isset($argv[1]) && is_numeric($argv[1])) {
+    $port = (int)$argv[1];
+}
+
 // Router initialisieren
 $router = new Router();
 
-// Startseite definieren
-$router->get('/', function(Request $request) {
-    $html = "<h1>PHP Raw Socket Server Demo (mit Router)</h1>";
-    $html .= "<p><strong>Method:</strong> " . htmlspecialchars($request->getMethod()) . "</p>";
-    $html .= "<p><strong>URI:</strong> " . htmlspecialchars($request->getUri()) . "</p>";
-    $html .= "<h3>Headers:</h3><ul>";
-    foreach ($request->getHeaders() as $key => $val) {
-        $html .= "<li><strong>" . htmlspecialchars($key) . ":</strong> " . htmlspecialchars($val) . "</li>";
-    }
-    $html .= "</ul>";
-    $html .= "<hr><p><a href='/health'>Check Server Health (JSON)</a></p>";
-
-    return new Response($html);
+// Startseite / Dashboard definieren
+$router->get('/', function(Request $request) use ($port) {
+    return new Response(View::renderDashboard($request, $port));
 });
 
-
-// Health-Check-Route definieren
+// Health-Check-Route definieren (JSON)
 $router->get('/health', function(Request $request) {
     $data = [
         'status' => 'online',
         'php_version' => PHP_VERSION,
-        'uptime_seconds' => time() - SERVER_START_TIME
+        'uptime_seconds' => time() - SERVER_START_TIME,
+        'memory_usage_bytes' => memory_get_usage(true),
+        'timestamp' => date('c')
     ];
-    return new Response(json_encode($data), 200, ['Content-Type' => 'application/json']);
+    return new Response(json_encode($data, JSON_PRETTY_PRINT), 200, ['Content-Type' => 'application/json']);
 });
 
+// Status-Code Simulation
 $router->get('/status/{code}', function(Request $request, array $params) {
     $code = (int)($params[0] ?? 200);
-    
-    $html = "<h1>Status Code: {$code}</h1>";
-    $html .= "<p>Dies ist ein Test für den HTTP-Statuscode {$code}.</p>";
-    $html .= "<hr><p><a href='/'>Zurück zur Startseite</a></p>";
+    $resp = new Response('', $code);
+    $phrase = $resp->getStatusPhrase();
 
-    return new Response($html, $code);
+    return new Response(View::renderStatus($code, $phrase), $code);
 });
 
-
-// Server starten (Port 8080)
-$server = new Server('127.0.0.1', 8080);
+// Server starten
+$server = new Server('127.0.0.1', $port);
 
 $server->listen(function(Request $request) use ($router) {
     // Schönes Logging im Terminal bei jedem Aufruf
