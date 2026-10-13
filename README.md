@@ -49,10 +49,25 @@ curl http://localhost:8080
 ├── server               # CLI entry point script
 ├── src/
 │   ├── Server.php       # TCP socket server listener & event loop
-│   ├── Response.php     # HTTP response builder
+│   ├── Request.php      # HTTP request parser
+│   ├── Response.php     # HTTP response serializer
+│   ├── Router.php       # HTTP router & static file handler
+│   └── View.php         # Presentation templates & dashboards
 └── public/
-    └── index.php        # Public web root entry
+    ├── index.php        # Web entry point
+    └── style.css        # Dashboard CSS stylesheet
 ```
+
+## Available UI Themes & Branches
+
+Du kannst zwischen verschiedenen UI-Designs wechseln, indem du die jeweiligen Branches auscheckst:
+
+1. **`main` / `step-3-dashboard-ui`**: **Modern Glassmorphism Dark Theme**
+   - Vercel/Linear-inspiriertes dunkles Dashboard mit Live-Uptime, Header-Suchfilter, interaktivem AJAX Route Tester und Health Ping Telemetrie.
+2. **`idea/cyberpunk-terminal-hud`**: **Retro Cyberpunk Terminal & HUD**
+   - Matrix-inspiriertes Monospace-Terminal mit CRT Scanlines, ASCII-Banner und interaktiver Shell (`help`, `health`, `curl`, `routes`).
+3. **`idea/minimalist-nordic-light`**: **Nordic Minimalist Light Theme**
+   - Clean Apple/Stripe-inspiriertes helles Design mit weichen Schatten, aufgeräumten Tabellen und Dark-Mode-Toggle.
 
 ## How It Works
 
